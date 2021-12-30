@@ -1,0 +1,28 @@
+@import "./common.css";
+/*@import "./hsea.min.css";*/
+
+
+@font-face {
+    /*font-family: "DIN Alternate Bold";*/
+    font-family: "LCNumber";
+    /*src: url("../assets/fonts/DIN Alternate Bold.ttf");*/
+    src: url("../assets/fonts/LCNumber104.otf");
+    /*url("../../../assets/fonts/DIN Alternate Bold.ttf");*/
+}
+
+@font-face {
+    font-family: "SourceHanSansSC";
+    src: url("../assets/fonts/SourceHanSansSC-Regular.otf");
+}
+
+.red {
+    color: #EF4034 !important;
+}
+
+.green {
+    color: #03AD7F !important;
+}
+
+.black {
+    color: #2A2B30 !important;
+}
