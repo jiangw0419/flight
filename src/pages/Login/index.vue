@@ -25,8 +25,7 @@ export default {
     })
     const goHome = () => {
       if ("admin" === state.userAccount && "123456" === state.userPwd) {
-        console.log("---->登录成功")
-        console.log("----->store", store)
+        //模拟登录成功，存储数据到session中
         store.dispatch("user/saveUserInfo", {
           userAccount: state.userAccount,
           userPassword: state.userPwd
