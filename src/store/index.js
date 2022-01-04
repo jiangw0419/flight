@@ -9,9 +9,16 @@ export default createStore({
     modules,
     plugins: [
         createPersistedState({
-            key: location.origin + location.pathname,
+            key: location.origin + location.pathname + 'user',
             paths: ['user'],
             storage: window.sessionStorage,
-        })],
+        }),
+        createPersistedState({
+            key: location.origin + location.pathname + 'appInfo',
+            paths: ['appInfo'],
+            storage: window.sessionStorage,
+        }),
+
+    ],
 })
 

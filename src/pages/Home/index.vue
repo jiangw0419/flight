@@ -5,9 +5,9 @@
         <img src="@/assets/user.png" alt="">
       </div>
       <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
-        <a-menu-item key="1">
+        <a-menu-item :key="index" v-for="(item,index) in menuItems">
           <user-outlined/>
-          <span>{{ title }}</span>
+          <span>{{ item }}</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
@@ -21,52 +21,23 @@
         <span class="logout">退出</span>
       </a-layout-header>
       <!--      内容区域-->
-      <a-layout-content class="content-group">
-        <div class="content-title">
-          <span>{{ title }}</span>
-          <div class="add-container" @click="changeShowForm">
-            <PlusCircleOutlined/>
-            <span>创建应用</span>
-          </div>
-        </div>
-        <!--创建应用编辑框-->
-        <a-form
-            :model="formState"
-            name="basic"
-            :label-col="{ span: 8 }"
-            :wrapper-col="{ span: 16 }"
-            autocomplete="off"
-            @finish="onFinish"
-            @finishFailed="onFinishFailed"
-        >
-          <a-form-item
-              label="Username"
-              name="username"
-              :rules="[{ required: true, message: 'Please input your username!' }]"
-          >
-            <a-input v-model:value="formState.username"/>
-          </a-form-item>
-        </a-form>
-
-        <!--应用列表-->
-        <div class="content-grid">
-          <div v-for="(item,index) in applicationList" :key="index" class="grid-item">
-          </div>
-        </div>
-
-      </a-layout-content>
+      <router-view></router-view>
+      <!--  底部区域    -->
+      <a-layout-footer style="text-align: center; font-weight: bold">
+        Test Flight ©2022 Created by 联储金工大前端组
+      </a-layout-footer>
     </a-layout>
   </a-layout>
 </template>
 
 <script>
-import {reactive, toRefs} from "vue";
+import {reactive, toRefs, watch} from "vue";
 import {
   UserOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
-  PlusCircleOutlined
 } from '@ant-design/icons-vue';
+import {useRouter} from "vue-router";
 
 export default {
   name: "index",
@@ -74,46 +45,34 @@ export default {
     UserOutlined,
     MenuUnfoldOutlined,
     MenuFoldOutlined,
-    PlusCircleOutlined
   },
 
   setup() {
+    const router = useRouter()
     const state = reactive({
       collapsed: false,
-      selectedKeys: ["1"],
-      applicationList: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11],
-      layoutLeft: 200,
-      title: '我的应用',
-      showForm: true,
+      selectedKeys: [0],
+      layoutLeft: 200,//default 展开200  收缩80
+      menuItems: ['我的应用', '其他'],
     })
-
-    const formState = reactive({
-      username: '',
-    });
-    const onFinish = values => {
-      console.log('Success:', values);
-    };
-
 
     const changeColloapse = () => {
       state.collapsed = !state.collapsed
       state.layoutLeft = state.collapsed ? 80 : 200
     }
-    const changeShowForm = () => {
-      state.showForm = !state.showForm
-    }
 
-    const cancelForm = () => {
-      state.showForm = false
-    }
+    //监听侧栏菜单选项卡
+    watch(() => state.selectedKeys, (newValue) => {
+      if (0 === newValue[0]) {
+        router.push("/")
+      } else {
+        router.push("/other")
+      }
+    })
 
     return ({
       ...toRefs(state),
       changeColloapse,
-      changeShowForm,
-      cancelForm,
-      formState,
-      onFinish
     })
   }
 }

@@ -6,7 +6,23 @@ const routes =
         {
             path: '/',
             name: 'Home',
-            component: () => import('@/pages/Home')
+            component: () => import('@/pages/Home'),
+            children: [
+                {
+                    path: '',
+                    name: '/Applications',
+                    component: () => import('@/pages/Home/Applications')
+                },
+                {
+                    path: 'applicatiton-info',
+                    name: '/ApplicationInfo',
+                    component: () => import('@/pages/Home/ApplicationInfo')
+                }, {
+                    path: 'other',
+                    name: '/Other',
+                    component: () => import('@/pages/Home/Others')
+                }
+            ]
         },
         {
             path: '/login',

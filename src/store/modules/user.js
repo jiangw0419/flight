@@ -20,10 +20,8 @@ const actions = {
                     console.log("getAccountInfoFromWeb---error", error)
                     resolve({})
                 })
-
         })
     }
-
 }
 
 const mutations = {
