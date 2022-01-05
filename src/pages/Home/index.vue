@@ -5,7 +5,7 @@
         <img src="@/assets/user.png" alt="">
       </div>
       <a-menu v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
-        <a-menu-item :key="index" v-for="(item,index) in menuItems">
+        <a-menu-item :key="index" v-for="(item,index) in menuItems" @click="clickItem(index)">
           <user-outlined/>
           <span>{{ item }}</span>
         </a-menu-item>
@@ -21,7 +21,9 @@
         <span class="logout">退出</span>
       </a-layout-header>
       <!--      内容区域-->
-      <router-view></router-view>
+      <a-layout-content class="content-group" style="overflow: initial">
+        <router-view></router-view>
+      </a-layout-content>
       <!--  底部区域    -->
       <a-layout-footer style="text-align: center; font-weight: bold">
         Test Flight ©2022 Created by 联储金工大前端组
@@ -31,7 +33,7 @@
 </template>
 
 <script>
-import {reactive, toRefs, watch} from "vue";
+import {reactive, toRefs} from "vue";
 import {
   UserOutlined,
   MenuUnfoldOutlined,
@@ -62,17 +64,18 @@ export default {
     }
 
     //监听侧栏菜单选项卡
-    watch(() => state.selectedKeys, (newValue) => {
-      if (0 === newValue[0]) {
+    const clickItem = (index) => {
+      if (0 === index) {
         router.push("/")
       } else {
         router.push("/other")
       }
-    })
+    }
 
     return ({
       ...toRefs(state),
       changeColloapse,
+      clickItem,
     })
   }
 }

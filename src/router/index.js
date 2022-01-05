@@ -11,7 +11,8 @@ const routes =
                 {
                     path: '',
                     name: '/Applications',
-                    component: () => import('@/pages/Home/Applications')
+                    component: () => import('@/pages/Home/Applications'),
+                    meta: {slideKey: 0}
                 },
                 {
                     path: 'applicatiton-info',
@@ -20,7 +21,8 @@ const routes =
                 }, {
                     path: 'other',
                     name: '/Other',
-                    component: () => import('@/pages/Home/Others')
+                    component: () => import('@/pages/Home/Others'),
+                    meta: {slideKey: 1}
                 }
             ]
         },

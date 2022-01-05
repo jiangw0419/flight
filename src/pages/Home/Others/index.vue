@@ -1,5 +1,5 @@
 <template>
-  <div style="background: #0EC8FF">
+  <div style="background: #FFF;overflow: initial;">
     其他
   </div>
 </template>
