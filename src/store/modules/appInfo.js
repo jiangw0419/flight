@@ -16,6 +16,7 @@ const mutations = {
 const state = {
     appInfos: [
         // {
+        //     appId:''
         //     appName:'',
         //     appDesc:'',
         //     packageName:'',

@@ -32,13 +32,13 @@
       </a-tab-pane>
       <!--  基本信息    -->
       <a-tab-pane key="2" tab="基本信息" force-render>
-        <BasicAppInfo :is-show-pencil="true" :is-reset-data="false" :is-cancel-hide-submit="true"
+        <BasicAppInfo :app-info="appInfo" :is-show-pencil="true" :is-reset-data="false" :is-cancel-hide-submit="true"
                       :is-can-modify="false"></BasicAppInfo>
       </a-tab-pane>
 
       <!--      成员管理-->
       <a-tab-pane key="3" tab="成员管理">
-
+        <UserList :user-list="userList"></UserList>
       </a-tab-pane>
     </a-tabs>
 
@@ -46,11 +46,14 @@
 </template>
 
 <script>
-import {reactive, toRefs} from "vue";
+import {onMounted, reactive, toRefs} from "vue";
 import {InboxOutlined} from "@ant-design/icons-vue";
 import {message} from "ant-design-vue";
 import AppInfoList from "@/components/AppInfoList";
 import BasicAppInfo from "@/components/BasicAppInfo";
+import UserList from "@/components/UserList";
+import {useStore} from "vuex";
+import {useRoute} from "vue-router";
 
 export default {
   name: "index",
@@ -58,12 +61,17 @@ export default {
     InboxOutlined,
     AppInfoList,
     BasicAppInfo,
+    UserList
   },
   setup() {
+    const store = useStore()
+    const route = useRoute()
     const state = reactive({
       activeKey: '1',
       activeChildKey: '1',
-      fileList: []
+      fileList: [],
+      userList: [],
+      appInfo: null
     })
 
     //上传
@@ -78,6 +86,16 @@ export default {
         message.error(`${info.file.name} file upload failed.`);
       }
     };
+
+    onMounted(() => {
+      const result = store.state.user.userInfo
+      state.userList.push(result)
+
+      const appId = route.query.appId
+      const appInfoList = store.state.appInfo.appInfos
+      state.appInfo = appInfoList.find(item => item.appId === appId)
+      console.log("-----applicationInfo---->>>>", state.appInfo)
+    })
 
     return ({
       ...toRefs(state),

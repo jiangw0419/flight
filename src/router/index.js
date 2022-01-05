@@ -43,7 +43,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     if (to.name !== 'Login') {
         isAccountLogin().then(data => {
-            console.log("beforeEach------>", data)
+            // console.log("beforeEach------>", data)
             if (data) {
                 next()
             } else {

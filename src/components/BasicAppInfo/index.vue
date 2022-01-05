@@ -55,7 +55,7 @@
 </template>
 
 <script>
-import {reactive, ref, toRefs} from "vue";
+import {reactive, ref, toRefs, watch} from "vue";
 import {message} from "ant-design-vue";
 import {useStore} from "vuex";
 import {EditTwoTone} from "@ant-design/icons-vue";
@@ -66,6 +66,10 @@ export default {
     EditTwoTone
   },
   props: {
+    appInfo: {
+      type: Object,
+      default: null
+    },
     isShowPencil: {
       type: Boolean,
       default: false
@@ -86,16 +90,16 @@ export default {
       type: Function,
       default: null
     }
-
   },
   setup(props) {
     const store = useStore()
     const formRef = ref()
     const state = reactive({
       isShowConfirmAndCancel: !props.isCancelHideSubmit,
-      isCanEdit: props.isCanModify
+      isCanEdit: props.isCanModify,
     })
     const formState = reactive({
+      appId: '',//暂时用app名称作为appId
       appName: '',
       appDesc: '',
       packageName: '',
@@ -133,9 +137,11 @@ export default {
     }
 
     const onFinish = values => {
-      console.log('Success:', values);
       //全部验证通过
-      //后期改为存储服务器数据库
+      console.log('Success:', values);
+      //暂时用app名称作为appId
+      values.appId = values.appName
+      //后期改为存储服务器数据库,
       store.dispatch("appInfo/saveAppInfo", values).then(() => {
         cancelForm()
       }).catch(error => {
@@ -154,12 +160,24 @@ export default {
       if (props.cancelCallback) {
         props.cancelCallback()
       }
+      state.isCanEdit = false
     }
 
     const startModify = () => {
-      state.isCanEdit = !state.isCanEdit
+      state.isCanEdit = true
       state.isShowConfirmAndCancel = true
     }
+
+    watch(() => props.appInfo, newValue => {
+      if (newValue) {
+        formState.appId = newValue.appId
+        formState.appName = newValue.appName
+        formState.appDesc = newValue.appDesc
+        formState.packageName = newValue.packageName
+        formState.bundId = newValue.bundId
+      }
+    }, {immediate: true})
+
 
     return ({
       ...toRefs(state),

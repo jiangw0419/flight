@@ -12,7 +12,7 @@
                 :cancel-callback="changeShowForm"></BasicAppInfo>
   <!--    应用列表-->
   <div class="content-grid">
-    <div v-for="(item,index) in applicationList" :key="index" class="grid-item" @click="goApplicationDetail">
+    <div v-for="(item,index) in applicationList" :key="index" class="grid-item" @click="goApplicationDetail(item)">
       <img src="@/assets/user.png" alt="">
       <div>
         <h3>{{ item.appName }}</h3>
@@ -31,6 +31,7 @@ import {useStore} from "vuex";
 import {PlusCircleOutlined} from "@ant-design/icons-vue";
 import {openNewView} from "@/utils/bridges";
 import BasicAppInfo from "@/components/BasicAppInfo";
+import qs from "qs";
 
 export default {
   name: "index",
@@ -51,8 +52,8 @@ export default {
     }
 
     //跳转到详情
-    const goApplicationDetail = () => {
-      openNewView('/applicatiton-info')
+    const goApplicationDetail = (appInfo) => {
+      openNewView('/applicatiton-info?' + qs.stringify({appId: appInfo.appId}))
     }
     const changeShowForm = () => {
       state.showForm = !state.showForm
