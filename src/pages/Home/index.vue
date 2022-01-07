@@ -18,7 +18,7 @@
           <menu-unfold-outlined v-if="collapsed" class="trigger" @click="changeColloapse"/>
           <menu-fold-outlined v-else class="trigger" @click="changeColloapse"/>
         </div>
-        <span class="logout">退出</span>
+        <span class="logout" @click="logout">退出</span>
       </a-layout-header>
       <!--      内容区域-->
       <a-layout-content class="content-group" style="overflow: initial">
@@ -40,6 +40,10 @@ import {
   MenuFoldOutlined,
 } from '@ant-design/icons-vue';
 import {useRouter} from "vue-router";
+import {message, Modal} from "ant-design-vue";
+import {useStore} from "vuex";
+import {openNewView} from "@/utils/bridges";
+import qs from "qs";
 
 export default {
   name: "index",
@@ -51,6 +55,7 @@ export default {
 
   setup() {
     const router = useRouter()
+    const store = useStore()
     const state = reactive({
       collapsed: false,
       selectedKeys: [0],
@@ -72,10 +77,28 @@ export default {
       }
     }
 
+    //退出
+    const logout = async () => {
+      Modal.confirm({
+        title: '温馨提示',
+        content: '确认退出?',
+        onOk: async () => {
+          let result = await store.dispatch("user/logout")
+          console.log("------>resylt===", result)
+          if (result) {
+            openNewView("/?" + qs.stringify({closeCount: 1}))
+          } else {
+            message.warn("result=" + result)
+          }
+        }
+      })
+    }
+
     return ({
       ...toRefs(state),
       changeColloapse,
       clickItem,
+      logout
     })
   }
 }

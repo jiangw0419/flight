@@ -3,7 +3,10 @@ import App from './App.vue'
 import router from "./router";
 import store from "@/store";
 import {Button, Layout, Menu, Input, Form, Tabs, Upload} from 'ant-design-vue';
+import handleAxiosConfig from "@/utils/http";
+import axios from "axios";
 
+handleAxiosConfig(axios)
 
 const app = createApp(App)
 app.use(router)

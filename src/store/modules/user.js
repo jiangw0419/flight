@@ -1,8 +1,16 @@
 import {getAccountInfoFromWeb} from "@/utils/bridges";
 
+//异步操作
 const actions = {
+    logout(context) {
+        return new Promise(resolve => {
+            context.commit("LOGOUT")
+            resolve(true)
+        })
+    },
+
     saveUserInfo(context, userInfo) {
-        console.log("saveUserInfo----->", userInfo.userAccount, userInfo.userPassword)
+        console.log("saveUserInfo----->", userInfo.userAccount)
         context.commit("SAVE_USER_INFO", userInfo)
     },
     getAccountInfo() {
@@ -10,7 +18,7 @@ const actions = {
             //从session中获取数据
             getAccountInfoFromWeb()
                 .then(data => {
-                    if (data.userAccount && data.userPassword) {
+                    if (data.userAccount) {
                         resolve(data)
                     } else {
                         resolve({})
@@ -24,17 +32,20 @@ const actions = {
     }
 }
 
+//同步操作
 const mutations = {
     SAVE_USER_INFO(state, userInfo) {
         state.userInfo.userAccount = userInfo.userAccount
-        state.userInfo.userPassword = userInfo.userPassword
+    },
+    LOGOUT(state) {
+        state.userInfo = {}
+        console.log("-------LOGOUT-->", state.userInfo)
     }
 }
 
 const state = {
     userInfo: {
         userAccount: '',
-        userPassword: '',
         accessToken: ''
     }
 }

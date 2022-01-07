@@ -27,13 +27,14 @@ module.exports = {
         hotOnly: false,
         disableHostCheck: true,
         // 将任何未知请求 (没有匹配到静态文件的请求) 代理到该字段指向的地方
-        // proxy: {
-        //     '/api-gateway': {
-        //         target: 'https://wxcbb.lczq.com',
-        //         // target: 'http://lczq.bullsoft.org',
-        //         secure: false,
-        //         // changeOrigin: true,
-        //     },
-        // },
+        proxy: {
+            '/serverProxy': {
+                target: 'http://192.168.74.144:3000',
+                secure: false,
+                pathRewrite:{
+                    "^/serverProxy":"/"
+                }
+            },
+        },
     },
 }

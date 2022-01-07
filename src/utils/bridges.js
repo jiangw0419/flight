@@ -69,7 +69,6 @@ export function getAccountInfoFromWeb() {
         console.log("getAccountInfoFromWeb---user->", user)
         resolve({
             userAccount: user.userInfo.userAccount,
-            userPassword: user.userInfo.userPassword,
             accessToken: user.userInfo.accessToken,
         });
     })

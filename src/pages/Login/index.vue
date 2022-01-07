@@ -3,7 +3,6 @@
     <img src="@/assets/logo.png" alt="">
     <input type="text" placeholder="请输入账号" v-model="userAccount">
     <input type="password" placeholder="请输入密码" v-model="userPwd">
-    <!--    <van-button class="btn" type="primary" @click="goHome()">登录</van-button>-->
     <a-button class="btn" type="primary" @click="goHome()">登录</a-button>
 
   </div>
@@ -14,6 +13,7 @@ import {reactive, toRefs} from "vue";
 import {message} from "ant-design-vue";
 import {useStore} from "vuex";
 import {openNewView} from "@/utils/bridges";
+import {queryUserInfo} from "@/utils/service";
 
 export default {
   name: "index",
@@ -23,16 +23,16 @@ export default {
       userAccount: '',
       userPwd: '',
     })
-    const goHome = () => {
-      if ("admin" === state.userAccount && "123456" === state.userPwd) {
-        //模拟登录成功，存储数据到session中
-        store.dispatch("user/saveUserInfo", {
+    const goHome = async () => {
+      const result = await queryUserInfo({account: state.userAccount, password: state.userPwd})
+      console.log("------>>>>result", result)
+      if (result.length > 0) {
+        await store.dispatch("user/saveUserInfo", {
           userAccount: state.userAccount,
-          userPassword: state.userPwd
         },)
         openNewView("/")
       } else {
-        message.warn("账号密码错误")
+        message.error("请先联系系统管理员进行注册")
       }
     }
     return ({
