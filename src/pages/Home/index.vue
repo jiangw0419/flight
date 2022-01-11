@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import {reactive, toRefs} from "vue";
+import {onMounted, reactive, toRefs} from "vue";
 import {
   UserOutlined,
   MenuUnfoldOutlined,
@@ -70,6 +70,7 @@ export default {
 
     //监听侧栏菜单选项卡
     const clickItem = (index) => {
+      console.log("0000000000index=", index, state.selectedKeys)
       if (0 === index) {
         router.push("/")
       } else {
@@ -88,11 +89,20 @@ export default {
           if (result) {
             openNewView("/?" + qs.stringify({closeCount: 1}))
           } else {
-            message.warn("result=" + result)
+            message.warn("退出失败")
           }
         }
       })
     }
+
+    onMounted(() => {
+      let path = router.currentRoute.value.path
+      if (path === '/other') {
+        state.selectedKeys = [1]
+      } else {
+        state.selectedKeys = [0]
+      }
+    })
 
     return ({
       ...toRefs(state),

@@ -34,7 +34,7 @@
           name="packageName"
           validateTrigger="blur"
           :rules="[{ required: true, message: '请输入android包名' }]">
-        <a-textarea v-model:value="formState.packageName" :disabled="!isCanEdit"/>
+        <a-textarea v-model:value="formState.packageName" :disabled="!isCanModify"/>
       </a-form-item>
 
       <a-form-item
@@ -42,7 +42,7 @@
           name="bundId"
           validateTrigger="blur"
           :rules="[{ required: true, message: '请输入IOS bund ID' }]">
-        <a-input v-model:value="formState.bundId" :disabled="!isCanEdit"/>
+        <a-input v-model:value="formState.bundId" :disabled="!isCanModify"/>
       </a-form-item>
 
       <a-form-item v-if="isShowConfirmAndCancel" :wrapper-col="{ offset: 8, span: 16 }">
@@ -56,9 +56,9 @@
 
 <script>
 import {reactive, ref, toRefs, watch} from "vue";
-import {message} from "ant-design-vue";
-import {useStore} from "vuex";
 import {EditTwoTone} from "@ant-design/icons-vue";
+import {addApp, updateAppById} from "@/utils/service";
+import {message} from "ant-design-vue";
 //基本信息编辑框
 export default {
   name: "index",
@@ -89,10 +89,10 @@ export default {
     cancelCallback: {
       type: Function,
       default: null
-    }
+    },
+    successCallBack: {}
   },
   setup(props) {
-    const store = useStore()
     const formRef = ref()
     const state = reactive({
       isShowConfirmAndCancel: !props.isCancelHideSubmit,
@@ -136,17 +136,24 @@ export default {
       //表单验证不通过
     }
 
-    const onFinish = values => {
-      //全部验证通过
-      console.log('Success:', values);
-      //暂时用app名称作为appId
-      values.appId = values.appName
-      //后期改为存储服务器数据库,
-      store.dispatch("appInfo/saveAppInfo", values).then(() => {
+    const onFinish = async values => {
+      //判断是更新还是新增
+      let result = null
+      if (props.isShowPencil) {//更新
+        result = await updateAppById(values)
+      } else {
+        result = await addApp(values)
+      }
+      console.log("----data>>>", result)
+      if (result && 1 === result.flag) {
+        // 添加成功
         cancelForm()
-      }).catch(error => {
-        message.warn("提交失败!", error)
-      })
+        if (props.successCallBack) {
+          props.successCallBack()
+        }
+      } else {
+        message.warn(result.error_info)
+      }
     };
 
 
@@ -164,8 +171,8 @@ export default {
     }
 
     const startModify = () => {
-      state.isCanEdit = true
-      state.isShowConfirmAndCancel = true
+      state.isCanEdit = !state.isCanEdit
+      state.isShowConfirmAndCancel = !state.isShowConfirmAndCancel
     }
 
     watch(() => props.appInfo, newValue => {

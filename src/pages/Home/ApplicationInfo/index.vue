@@ -6,17 +6,28 @@
       <a-tab-pane key="1" tab="包管理">
         <div>
           <a-upload-dragger
-              v-model:fileList="fileList"
-              name="file"
-              :multiple="true"
-              action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-              @change="handleChange"
+              :fileList="fileList"
+              :beforeUpload="beforeUpload"
+              :showUploadList="false"
+              :customRequest="customRequest"
           >
             <p class="ant-upload-drag-icon">
               <inbox-outlined></inbox-outlined>
             </p>
             <p class="ant-upload-text">点击或者拖拽apk到这里上传</p>
           </a-upload-dragger>
+          <a-progress :percent="percent" v-if="progressShow"/>
+          <!--对话框 -start-->
+          <a-modal
+              v-model:visible="visible"
+              title="版本描述"
+              @ok="handleOk"
+          >
+            <p style="margin-bottom: 10px">{{ appFileName }}</p>
+            <a-textarea v-model:value="appDesc" placeholder="请输入版本描述信息" allow-clear/>
+          </a-modal>
+          <!--对话框 -end-->
+
           <a-tabs v-model:activeKey="activeChildKey" type="card">
             <a-tab-pane key="1" tab="全部">
               <AppInfoList></AppInfoList>
@@ -33,7 +44,7 @@
       <!--  基本信息    -->
       <a-tab-pane key="2" tab="基本信息" force-render>
         <BasicAppInfo :app-info="appInfo" :is-show-pencil="true" :is-reset-data="false" :is-cancel-hide-submit="true"
-                      :is-can-modify="false"></BasicAppInfo>
+                      :is-can-modify="false" :successCallBack="queryApp"></BasicAppInfo>
       </a-tab-pane>
 
       <!--      成员管理-->
@@ -48,12 +59,13 @@
 <script>
 import {onMounted, reactive, toRefs} from "vue";
 import {InboxOutlined} from "@ant-design/icons-vue";
-import {message} from "ant-design-vue";
 import AppInfoList from "@/components/AppInfoList";
 import BasicAppInfo from "@/components/BasicAppInfo";
 import UserList from "@/components/UserList";
-import {useStore} from "vuex";
 import {useRoute} from "vue-router";
+import {fileUpload, queryAppById} from "@/utils/service";
+import {parser} from "@/utils/fileUtils";
+import {message} from "ant-design-vue";
 
 export default {
   name: "index",
@@ -64,42 +76,124 @@ export default {
     UserList
   },
   setup() {
-    const store = useStore()
     const route = useRoute()
     const state = reactive({
       activeKey: '1',
       activeChildKey: '1',
       fileList: [],
       userList: [],
-      appInfo: null
-    })
+      appInfo: null,
 
-    //上传
-    const handleChange = info => {
-      const status = info.file.status;
-      if (status !== 'uploading') {
-        console.log(info.file, info.fileList);
+      appFileName: '',
+      visible: false,
+      appDesc: '',
+      isCanUpload: false,
+      progressShow: false,
+      percent: 0
+    })
+    //对话框
+    const showModal = () => {
+      state.visible = true
+    }
+    const handleOkBefore = () => {
+      //隐藏对话框
+      state.visible = false;
+      //设置能够上传
+      state.isCanUpload = true
+      //显示进度条
+      state.progressShow = true
+    }
+    const handleOk = () => {
+      customRequest()
+    }
+    const handleOkAfter = () => {
+      //隐藏进度条
+      state.progressShow = false
+      //重置能够上传标识
+      state.isCanUpload = false
+      //清空描述
+      state.appDesc = ""
+    }
+
+    //上传前校验文件类型
+    const beforeUpload = async (file) => {
+      state.fileList = [file]
+      state.appFileName = file.name
+      //判断包名是否一致
+      let result = await parser(file)
+      if (result) {
+        let packageName = result.package
+        console.log("----->>>>>>>", packageName, state.appInfo.packageName)
+        if (packageName === state.appInfo.packageName) {
+          showModal()
+        } else {
+          message.warn("包名不匹配")
+        }
+      } else {
+        message.warn("文件格式不匹配")
       }
-      if (status === 'done') {
-        message.success(`${info.file.name} file uploaded successfully.`);
-      } else if (status === 'error') {
-        message.error(`${info.file.name} file upload failed.`);
+      return false
+    }
+
+    //自定义上传
+    const customRequest = async () => {
+      handleOkBefore()
+      //对话框隐藏，才执行上传
+      if (state.isCanUpload) {
+        let file = state.fileList[0]
+        console.log("------>>>file=", file)
+        let result = await parser(file)
+        let label = result.application.label
+        let icon = result.icon
+        let packageName = result.package
+        let versionCode = result.versionCode
+        let versionName = result.versionName
+        // console.log("---》》label=", label)
+        // console.log("---》》icon=", icon)
+        // console.log("---》》package=", packageName)
+        // console.log("---》》versionCode=", versionCode)
+        // console.log("---》》versionName=", versionName)
+        const formData = new FormData()
+        formData.append("file", file)
+        formData.append("label", label)
+        formData.append("icon", icon)
+        formData.append("packageName", packageName)
+        formData.append("versionCode", versionCode)
+        formData.append("versionName", versionName)
+        formData.append("appDesc", state.appDesc)
+        formData.append("appId", state.appInfo.id)
+
+        let uploadResult = await fileUpload(formData, {
+          onUploadProgress({total, loaded}) {
+            console.log("------e>>>>", total, loaded)
+            let progress = Math.round(loaded * 100 / total).toFixed(2)
+            console.log("=======>>progress==", progress)
+            state.percent = Number(progress)
+          }
+        })
+        console.log("=======>>>>", uploadResult)
       }
-    };
+      handleOkAfter()
+    }
+    //查询app基础信息
+    const queryApp = async () => {
+      const id = route.params.id
+      let result = await queryAppById({id})
+      state.appInfo = result[0]
+      console.log("=======>>>appInfp=", result[0])
+    }
 
     onMounted(() => {
-      const result = store.state.user.userInfo
-      state.userList.push(result)
-
-      const appId = route.query.appId
-      const appInfoList = store.state.appInfo.appInfos
-      state.appInfo = appInfoList.find(item => item.appId === appId)
-      console.log("-----applicationInfo---->>>>", state.appInfo)
+      queryApp()
     })
 
     return ({
       ...toRefs(state),
-      handleChange
+      queryApp,
+      customRequest,
+      beforeUpload,
+      showModal,
+      handleOk,
     })
   }
 }

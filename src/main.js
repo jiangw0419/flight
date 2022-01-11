@@ -2,7 +2,7 @@ import {createApp} from 'vue'
 import App from './App.vue'
 import router from "./router";
 import store from "@/store";
-import {Button, Layout, Menu, Input, Form, Tabs, Upload} from 'ant-design-vue';
+import {Button, Layout, Menu, Input, Form, Tabs, Upload, Modal, Progress} from 'ant-design-vue';
 import handleAxiosConfig from "@/utils/http";
 import axios from "axios";
 
@@ -18,5 +18,7 @@ app.use(Input)
 app.use(Form)
 app.use(Tabs)
 app.use(Upload)
+app.use(Modal)
+app.use(Progress)
 
 window.vm = app.mount('#app')

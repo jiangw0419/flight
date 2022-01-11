@@ -1,4 +1,5 @@
 import {message} from "ant-design-vue";
+import Urls from "@/utils/api";
 
 const handleAxiosConfig = (axios) => {
     axios.defaults.timeout = 10000
@@ -11,6 +12,9 @@ const handleAxiosConfig = (axios) => {
             const _config = {...config}
             let params = config.params || {}
             const headers = config.headers
+            if (config.url.includes(Urls.fileUpload)) {
+                headers['Content-Type'] = 'multipart/form-data'
+            }
             return {..._config, params, headers}
         },
         (error) => {
@@ -29,7 +33,8 @@ const handleAxiosConfig = (axios) => {
             } else {
                 console.log("error_info------", error_info)
                 message.error(error_info)
-                return Promise.reject({error_no, error_info})
+                return {error_no, error_info}
+                // return Promise.reject({error_no,error_info})
             }
         },
         error => {

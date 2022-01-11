@@ -15,7 +15,7 @@ const routes =
                     meta: {slideKey: 0}
                 },
                 {
-                    path: 'applicatiton-info',
+                    path: 'applicatiton-info/:id',
                     name: '/ApplicationInfo',
                     component: () => import('@/pages/Home/ApplicationInfo')
                 }, {

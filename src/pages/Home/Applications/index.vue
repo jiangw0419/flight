@@ -9,7 +9,7 @@
   </div>
   <!--    创建应用编辑框-->
   <BasicAppInfo v-if="showForm" :is-cancel-hide-submit="false" :is-reset-data="true"
-                :cancel-callback="changeShowForm"></BasicAppInfo>
+                :cancel-callback="changeShowForm" :successCallBack="successCallBack"></BasicAppInfo>
   <!--    应用列表-->
   <div class="content-grid">
     <div v-for="(item,index) in applicationList" :key="index" class="grid-item" @click="goApplicationDetail(item)">
@@ -27,11 +27,10 @@
 
 <script>
 import {onMounted, reactive, toRefs} from "vue";
-import {useStore} from "vuex";
 import {PlusCircleOutlined} from "@ant-design/icons-vue";
 import {openNewView} from "@/utils/bridges";
 import BasicAppInfo from "@/components/BasicAppInfo";
-import qs from "qs";
+import {queryAllApps} from "@/utils/service";
 
 export default {
   name: "index",
@@ -40,7 +39,6 @@ export default {
     BasicAppInfo,
   },
   setup() {
-    const store = useStore()
     const state = reactive({
       applicationList: [],
       showForm: false,
@@ -53,22 +51,30 @@ export default {
 
     //跳转到详情
     const goApplicationDetail = (appInfo) => {
-      openNewView('/applicatiton-info?' + qs.stringify({appId: appInfo.appId}))
+      openNewView(`/applicatiton-info/${appInfo.id}`)
     }
     const changeShowForm = () => {
       state.showForm = !state.showForm
     }
+    const queryAllApplications = async () => {
+      let data = await queryAllApps()
+      state.applicationList = data
+    }
+
+    const successCallBack = () => {
+      queryAllApplications()
+    }
 
     onMounted(() => {
-      state.applicationList = store.state.appInfo.appInfos
+      queryAllApplications()
     })
-
 
     return ({
       ...toRefs(state),
       cancelForm,
       goApplicationDetail,
       changeShowForm,
+      successCallBack
     })
   }
 }
