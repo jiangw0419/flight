@@ -30,7 +30,7 @@
 
           <a-tabs v-model:activeKey="activeChildKey" type="card">
             <a-tab-pane key="1" tab="全部">
-              <AppInfoList></AppInfoList>
+              <AppInfoList :app-list="appList"></AppInfoList>
             </a-tab-pane>
             <a-tab-pane key="2" tab="android">
               <AppInfoList></AppInfoList>
@@ -63,7 +63,7 @@ import AppInfoList from "@/components/AppInfoList";
 import BasicAppInfo from "@/components/BasicAppInfo";
 import UserList from "@/components/UserList";
 import {useRoute} from "vue-router";
-import {fileUpload, queryAppById} from "@/utils/service";
+import {fileUpload, queryAppById, queryAppListByAppId} from "@/utils/service";
 import {parser} from "@/utils/fileUtils";
 import {message} from "ant-design-vue";
 
@@ -89,7 +89,10 @@ export default {
       appDesc: '',
       isCanUpload: false,
       progressShow: false,
-      percent: 0
+      percent: 0,
+      appList: [],
+      currentPage: 1,
+      pageSize: 10
     })
     //对话框
     const showModal = () => {
@@ -113,6 +116,8 @@ export default {
       state.isCanUpload = false
       //清空描述
       state.appDesc = ""
+      //重新查询列表
+      queryAppList()
     }
 
     //上传前校验文件类型
@@ -181,9 +186,22 @@ export default {
       let result = await queryAppById({id})
       state.appInfo = result[0]
       console.log("=======>>>appInfp=", result[0])
+      await queryAppList()
+    }
+
+    const queryAppList = async () => {
+      const appId = route.params.id
+      let result = await queryAppListByAppId({
+        appId,
+        page: state.currentPage,
+        pageSize: state.pageSize
+      })
+      state.appList = result
+      console.log("----queryAppListByAppId--->>>>>", result)
     }
 
     onMounted(() => {
+      state.currentPage = 1
       queryApp()
     })
 

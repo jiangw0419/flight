@@ -1,6 +1,11 @@
 const ApkParser = require('app-info-parser/src/apk')
 const IpaParser = require('app-info-parser/src/ipa')
 
+
+export const getSize = (total) => {
+    return (total / (1024 * 1024)).toFixed(2) + "M"
+}
+
 export const isIpa = (file) => {
     return file && file.name && file.name.indexOf(".") > 0 && file.name.split(".")[1].toLowerCase() === "ipa"
 }

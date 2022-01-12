@@ -8,7 +8,8 @@ const Urls = {
     updateAppById: "/serverProxy/app/updateAppById",
 
     //文件上传
-    fileUpload:"/serverProxy/file/fileUpload"
+    fileUpload:"/serverProxy/file/fileUpload",
+    queryAppListByAppId:"/serverProxy/appList/queryAppListByAppId"
 }
 
 export default Urls

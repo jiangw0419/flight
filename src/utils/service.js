@@ -21,8 +21,11 @@ export const queryAppById = async (data = {}) => {
 export const updateAppById = async (data = {}) => {
     return axios.post(Urls.updateAppById, data)
 }
-
 //上传app
 export const fileUpload = async (data = {}, config = {}) => {
     return axios.post(Urls.fileUpload, data, config)
+}
+//查询app列表
+export const  queryAppListByAppId = async (data = {}) => {
+    return axios.post(Urls.queryAppListByAppId, data)
 }
