@@ -49,10 +49,6 @@
         flex: 1;
       }
 
-      span:nth-child(4) {
-        flex: 3 !important;
-      }
-
       span:nth-last-child(2) {
         text-align: center;
       }
@@ -71,7 +67,25 @@
 }
 
 
-.item-desc{
+.item-desc {
+  flex: 3;
+
+}
+
+.qrcode {
+  display: flex;
   flex: 1;
 
+  span {
+    flex: 0 !important;
+  }
+}
+
+.operation {
+  display: flex;
+  flex-direction: column;
+
+  span {
+    padding: 4px;
+  }
 }

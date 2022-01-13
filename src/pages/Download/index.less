@@ -1,0 +1,80 @@
+
+.download-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  .qrcode-group {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+
+    .icon {
+      height: 100px;
+      width: 100px;
+      border-radius: 5px;
+      border-width: 10px;
+      border-style: solid;
+      border-color: white;
+      z-index: 2;
+      position: absolute;
+      left: -20px;
+      top: 50px;
+
+      img {
+        height: 80px;
+        width: 80px;
+        border-radius: 5px;
+      }
+    }
+
+    .download-qrcode {
+      height: 100px;
+      width: 100px;
+      border-radius: 5px;
+      border-width: 10px;
+      border-style: solid;
+      border-color: #f1f1f1;
+      z-index: 2;
+      position: absolute;
+      background-color: #f1f1f1;
+      bottom: -50px;
+      right: -20px;
+    }
+
+    .rectangle {
+      margin-top: 100px;
+      width: 200px;
+      height: 141px;
+      background-color: #f1f1f1;
+      transform: rotate(45deg);
+      border-radius: 5px;
+    }
+
+  }
+
+
+  .content-group {
+    margin-top: 71px;
+    display: flex;
+    flex-direction: column;
+
+  }
+
+  .version-desc {
+    display: flex;
+    align-items: center;
+
+    span {
+      margin-right: 10px;
+    }
+  }
+
+  .download-btn {
+    margin-top: 20px;
+  }
+
+}

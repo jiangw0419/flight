@@ -26,6 +26,18 @@ export const fileUpload = async (data = {}, config = {}) => {
     return axios.post(Urls.fileUpload, data, config)
 }
 //查询app列表
-export const  queryAppListByAppId = async (data = {}) => {
+export const queryAppListByAppId = async (data = {}) => {
     return axios.post(Urls.queryAppListByAppId, data)
+}
+//查询app相关信息
+export const queryAppDetailById = async (data = {}) => {
+    return axios.post(Urls.queryAppDetailById, data)
+}
+//更新app的版本描述信息
+export const updateAppDescById = async (data = {}) => {
+    return axios.post(Urls.updateAppDescById, data)
+}
+//根据平台查询app列表
+export const queryAppListByPlatform = async (data = {}) => {
+    return axios.post(Urls.queryAppListByPlatform, data)
 }

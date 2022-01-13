@@ -28,15 +28,15 @@
           </a-modal>
           <!--对话框 -end-->
 
-          <a-tabs v-model:activeKey="activeChildKey" type="card">
+          <a-tabs v-model:activeKey="activeChildKey" type="card" @change="tabChange">
             <a-tab-pane key="1" tab="全部">
               <AppInfoList :app-list="appList"></AppInfoList>
             </a-tab-pane>
             <a-tab-pane key="2" tab="android">
-              <AppInfoList></AppInfoList>
+              <AppInfoList :app-list="appList"></AppInfoList>
             </a-tab-pane>
             <a-tab-pane key="3" tab="iOS">
-              <AppInfoList></AppInfoList>
+              <AppInfoList :app-list="appList"></AppInfoList>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -90,9 +90,10 @@ export default {
       isCanUpload: false,
       progressShow: false,
       percent: 0,
-      appList: [],
+      appList: [],//全部列表
       currentPage: 1,
       pageSize: 10
+
     })
     //对话框
     const showModal = () => {
@@ -107,6 +108,7 @@ export default {
       state.progressShow = true
     }
     const handleOk = () => {
+      handleOkBefore()
       customRequest()
     }
     const handleOkAfter = () => {
@@ -127,7 +129,7 @@ export default {
       //判断包名是否一致
       let result = await parser(file)
       if (result) {
-        let packageName = result.package
+        let packageName = result.package || result.CFBundleIdentifier
         console.log("----->>>>>>>", packageName, state.appInfo.packageName)
         if (packageName === state.appInfo.packageName) {
           showModal()
@@ -142,17 +144,16 @@ export default {
 
     //自定义上传
     const customRequest = async () => {
-      handleOkBefore()
       //对话框隐藏，才执行上传
       if (state.isCanUpload) {
         let file = state.fileList[0]
         console.log("------>>>file=", file)
         let result = await parser(file)
-        let label = result.application.label
+        let label = result.CFBundleDisplayName || result.application.label
         let icon = result.icon
-        let packageName = result.package
-        let versionCode = result.versionCode
-        let versionName = result.versionName
+        let packageName = result.package || result.CFBundleIdentifier
+        let versionCode = result.versionCode || result.mobileProvision.Version
+        let versionName = result.versionName || result.CFBundleShortVersionString
         // console.log("---》》label=", label)
         // console.log("---》》icon=", icon)
         // console.log("---》》package=", packageName)
@@ -177,8 +178,8 @@ export default {
           }
         })
         console.log("=======>>>>", uploadResult)
+        handleOkAfter()
       }
-      handleOkAfter()
     }
     //查询app基础信息
     const queryApp = async () => {
@@ -191,13 +192,28 @@ export default {
 
     const queryAppList = async () => {
       const appId = route.params.id
+      let platform
+      if (state.activeChildKey === "2") {
+        platform = 1
+      } else if (state.activeChildKey === "3") {
+        platform = 2
+      } else {
+        platform = 0 //查所有
+      }
+      console.log("=====activeKey==>>>>", state.activeChildKey, platform)
       let result = await queryAppListByAppId({
         appId,
+        platform,
         page: state.currentPage,
         pageSize: state.pageSize
       })
       state.appList = result
       console.log("----queryAppListByAppId--->>>>>", result)
+    }
+    //筛选
+    const tabChange = (activityKey) => {
+      // state.activeChildKey = activityKey
+      queryAppList()
     }
 
     onMounted(() => {
@@ -212,6 +228,7 @@ export default {
       beforeUpload,
       showModal,
       handleOk,
+      tabChange,
     })
   }
 }
