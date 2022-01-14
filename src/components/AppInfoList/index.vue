@@ -101,7 +101,7 @@ export default {
       if (1 === result.flag) {
         message.info(result.info)
         //修改数据
-        props.appList.forEach(item => {
+        state.appList.forEach(item => {
           if (item.id === state.currentEditId) {
             item.desc = state.eDesc
           }
