@@ -2,6 +2,12 @@
 import store from "@/store";
 import {debounce} from "ant-design-vue/lib/vc-table/src/utils";
 
+
+export const openNewTabView = debounce(function (url) {
+    // const ref = window.vm.$router.resolve({name: 'Download', params: {appId: appId}})
+    const ref = window.vm.$router.resolve(url)
+    window.open(ref.href,'_blank')
+}, 500, true)
 /**
  * @param url
  */

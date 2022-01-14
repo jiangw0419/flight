@@ -29,14 +29,14 @@
           <!--对话框 -end-->
 
           <a-tabs v-model:activeKey="activeChildKey" type="card" @change="tabChange">
-            <a-tab-pane key="1" tab="全部">
-              <AppInfoList :app-list="appList"></AppInfoList>
+            <a-tab-pane :forceRender="true" key="1" tab="全部">
+              <AppInfoList ref="sonRef" :app-id="appId" :platform="0"></AppInfoList>
             </a-tab-pane>
-            <a-tab-pane key="2" tab="android">
-              <AppInfoList :app-list="appList"></AppInfoList>
+            <a-tab-pane :forceRender="true" key="2" tab="android">
+              <AppInfoList ref="sonRef1" :app-id="appId" :platform="1"></AppInfoList>
             </a-tab-pane>
-            <a-tab-pane key="3" tab="iOS">
-              <AppInfoList :app-list="appList"></AppInfoList>
+            <a-tab-pane :forceRender="true" key="3" tab="iOS">
+              <AppInfoList ref="sonRef2" :app-id="appId" :platform="2"></AppInfoList>
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -63,7 +63,7 @@ import AppInfoList from "@/components/AppInfoList";
 import BasicAppInfo from "@/components/BasicAppInfo";
 import UserList from "@/components/UserList";
 import {useRoute} from "vue-router";
-import {fileUpload, queryAppById, queryAppListByAppId} from "@/utils/service";
+import {fileUpload, queryAppById} from "@/utils/service";
 import {parser} from "@/utils/fileUtils";
 import {message} from "ant-design-vue";
 
@@ -78,6 +78,10 @@ export default {
   setup() {
     const route = useRoute()
     const state = reactive({
+      sonRef: null,
+      sonRef1: null,
+      sonRef2: null,
+      appId: route.params.id,
       activeKey: '1',
       activeChildKey: '1',
       fileList: [],
@@ -90,10 +94,6 @@ export default {
       isCanUpload: false,
       progressShow: false,
       percent: 0,
-      appList: [],//全部列表
-      currentPage: 1,
-      pageSize: 10
-
     })
     //对话框
     const showModal = () => {
@@ -120,6 +120,7 @@ export default {
       state.appDesc = ""
       //重新查询列表
       queryAppList()
+
     }
 
     //上传前校验文件类型
@@ -181,6 +182,7 @@ export default {
         handleOkAfter()
       }
     }
+
     //查询app基础信息
     const queryApp = async () => {
       const id = route.params.id
@@ -190,30 +192,19 @@ export default {
       await queryAppList()
     }
 
-    const queryAppList = async () => {
-      const appId = route.params.id
-      let platform
-      if (state.activeChildKey === "2") {
-        platform = 1
-      } else if (state.activeChildKey === "3") {
-        platform = 2
-      } else {
-        platform = 0 //查所有
-      }
-      console.log("=====activeKey==>>>>", state.activeChildKey, platform)
-      let result = await queryAppListByAppId({
-        appId,
-        platform,
-        page: state.currentPage,
-        pageSize: state.pageSize
-      })
-      state.appList = result
-      console.log("----queryAppListByAppId--->>>>>", result)
-    }
     //筛选
-    const tabChange = (activityKey) => {
-      // state.activeChildKey = activityKey
+    const tabChange = () => {
       queryAppList()
+    }
+    //调用子组件的方法
+    const queryAppList = () => {
+      if ("1" === state.activeChildKey) {
+        state.sonRef.queryAppList()
+      } else if ("2" === state.activeChildKey) {
+        state.sonRef1.queryAppList()
+      } else if ("3" === state.activeChildKey) {
+        state.sonRef2.queryAppList()
+      }
     }
 
     onMounted(() => {
@@ -229,6 +220,7 @@ export default {
       showModal,
       handleOk,
       tabChange,
+      queryAppList
     })
   }
 }

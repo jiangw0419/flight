@@ -41,6 +41,9 @@
       </div>
       <div class="line"></div>
     </div>
+    <div class="pagination">
+      <a-pagination v-model:current="current" :total="total" show-less-items @change="onPaginationChange"/>
+    </div>
   </div>
 
 </template>
@@ -50,8 +53,8 @@ import {reactive, toRefs} from "vue";
 import {getDate, getPlatform} from "@/utils/tools";
 import {getSize} from "@/utils/fileUtils";
 import {DeleteFilled, EditFilled, QrcodeOutlined, SaveFilled} from "@ant-design/icons-vue";
-import {openNewView} from "@/utils/bridges";
-import {updateAppDescById} from "@/utils/service";
+import {openNewTabView} from "@/utils/bridges";
+import {queryAppListByAppId, updateAppDescById} from "@/utils/service";
 import {message} from "ant-design-vue";
 
 export default {
@@ -63,27 +66,33 @@ export default {
     SaveFilled
   },
   props: {
-    appList: {
-      type: Array,
-      default: () => {
-        return []
-      }
-    }
+    appId: {
+      type: String,
+      default: ''
+    },
+    platform: {
+      type: Number,
+      default: 0 //0全部，1android，2iOS
+    },
   },
   setup(props) {
     const state = reactive({
       eDesc: '',
       showEditDesc: false,
-      currentEditId: ''
+      currentEditId: '',
+      current: 1,
+      appList: [],//全部列表
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
     })
     const goDownload = (appId) => {
-      openNewView(`/download/${appId}`)
+      openNewTabView(`/download/${appId}`)
     }
     const editDesc = (item) => {
       state.showEditDesc = true
       state.currentEditId = item.id
-      let desc = item.desc
-      state.eDesc = desc
+      state.eDesc = item.desc
     }
     const saveDesc = async () => {
       state.showEditDesc = false
@@ -100,6 +109,32 @@ export default {
       }
     }
 
+    const queryAppList = async () => {
+      const appId = props.appId
+      console.log("------>appId---->", appId, props.platform)
+      let result = await queryAppListByAppId({
+        appId,
+        platform: props.platform,
+        page: state.currentPage,
+        pageSize: state.pageSize
+      })
+
+      state.appList = result.data
+      state.total = result.total
+      console.log("----queryAppListByAppId--->>>>>", result)
+    }
+
+    /***
+     * 页码改变的回调，参数是改变后的页码及每页条数
+     * @param page
+     * @param pageSize
+     */
+    const onPaginationChange = (page, pageSize) => {
+      console.log("----->>>>", page, pageSize)
+      state.currentPage = page
+      queryAppList()
+    }
+
     return ({
       ...toRefs(state),
       getPlatform,
@@ -107,7 +142,9 @@ export default {
       getDate,
       goDownload,
       editDesc,
-      saveDesc
+      saveDesc,
+      onPaginationChange,
+      queryAppList
     })
   }
 }

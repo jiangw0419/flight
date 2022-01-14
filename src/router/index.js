@@ -46,20 +46,25 @@ const router = createRouter({
 
 
 router.beforeEach((to, from, next) => {
-    if (to.name !== 'Login') {
-        isAccountLogin().then(data => {
-            console.log("beforeEach------>", data)
-            if (data) {
-                next()
-            } else {
-                next({name: "Login"})
-            }
-        }).catch(() => {
-            next({name: "Login"})
-        })
-    } else {
+    if (to.name === "Download") {//不需要登录
         next()
+    } else {
+        if (to.name !== 'Login') {
+            isAccountLogin().then(data => {
+                console.log("beforeEach------>", data)
+                if (data) {
+                    next()
+                } else {
+                    next({name: "Login"})
+                }
+            }).catch(() => {
+                next({name: "Login"})
+            })
+        } else {
+            next()
+        }
     }
+
 })
 
 export default router
