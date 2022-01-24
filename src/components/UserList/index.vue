@@ -5,7 +5,7 @@
       <span>手机号</span>
       <span>权限</span>
     </div>
-    <div v-for="(user,index) in userList" :key="index" >
+    <div v-for="(user,index) in userList" :key="index">
       <div class="item">
         <span>{{ user.userAccount }}</span>
         <span>{{ user.userAccount }}</span>
@@ -18,14 +18,31 @@
 </template>
 
 <script>
+import {onMounted} from "vue";
+
 export default {
   name: "index",
   props: {
+    appId: {
+      type: String,
+      default: ''
+    },
     userList: {
       type: Array,
       default: () => []
     }
   },
+  setup() {
+
+    onMounted(() => {
+      //
+
+
+    })
+
+
+    return ({})
+  }
 }
 </script>
 

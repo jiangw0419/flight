@@ -13,6 +13,9 @@ const Urls = {
     queryAppDetailById: "/serverProxy/appList/queryAppDetailById",
     updateAppDescById: "/serverProxy/appList/updateAppDescById",//更新版本描述
     queryAppListByPlatform: "/serverProxy/appList/queryAppListByPlatform",
+    //角色
+    queryRoleByUser: "/serverProxy/role/queryRoleByUser",
+
 }
 
 export default Urls

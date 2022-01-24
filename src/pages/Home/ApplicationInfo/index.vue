@@ -66,6 +66,7 @@ import {useRoute} from "vue-router";
 import {fileUpload, queryAppById} from "@/utils/service";
 import {parser} from "@/utils/fileUtils";
 import {message} from "ant-design-vue";
+import {useStore} from "vuex";
 
 export default {
   name: "index",
@@ -77,6 +78,7 @@ export default {
   },
   setup() {
     const route = useRoute()
+    const store = useStore()
     const state = reactive({
       sonRef: null,
       sonRef1: null,
@@ -169,6 +171,7 @@ export default {
         formData.append("versionName", versionName)
         formData.append("appDesc", state.appDesc)
         formData.append("appId", state.appInfo.id)
+        formData.append("userAccount", store.state.user.userInfo.userAccount)
 
         let uploadResult = await fileUpload(formData, {
           onUploadProgress({total, loaded}) {
